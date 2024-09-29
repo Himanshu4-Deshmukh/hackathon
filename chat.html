@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Chat Room</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* Additional styles to ensure proper layout */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh; /* Full height of the screen */
+    }
+    .chat-box {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Chat Room Container -->
+  <div class="max-w-lg mx-auto mt-10 bg-white shadow-md rounded-lg chat-container">
+    <!-- Header -->
+    <div class="bg-pink-600 text-white text-center py-3 rounded-t-lg">
+      <h1 class="text-2xl font-semibold">Simple Chat Room</h1>
+    </div>
+
+    <!-- Chat Messages Box -->
+    <div id="chat-box" class="p-4 chat-box bg-gray-100 border-b border-gray-300">
+      <!-- Chat messages will appear here -->
+    </div>
+
+    <!-- Input and Send Button (Fixed at Bottom) -->
+    <div class="p-4 bg-white">
+      <div class="flex space-x-4">
+        <input id="message" type="text" placeholder="Type your message..." class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-pink-500">
+        <button id="send-btn" class="bg-pink-600 text-white py-2 px-4 rounded-lg hover:bg-pink-700 focus:outline-none">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sendBtn = document.getElementById('send-btn');
+    const messageInput = document.getElementById('message');
+    const chatBox = document.getElementById('chat-box');
+
+    const fetchMessages = async () => {
+      const response = await fetch('http://localhost:5000/api/chat/messages');
+      const messages = await response.json();
+      chatBox.innerHTML = ''; // Clear chat box
+      messages.forEach(msg => {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('my-2', 'p-2', 'bg-pink-200', 'rounded-lg', 'shadow');
+        messageElement.textContent = msg.message;
+        chatBox.appendChild(messageElement);
+      });
+    };
+
+    const sendMessage = async () => {
+      const message = messageInput.value.trim();
+      if (message) {
+        await fetch('http://localhost:5000/api/chat/message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message }),
+        });
+        messageInput.value = ''; // Clear input
+        fetchMessages(); // Refresh messages
+      }
+    };
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    // Pressing 'Enter' will also send the message
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    // Fetch messages on load
+    fetchMessages();
+  </script>
+
+</body>
+</html>
