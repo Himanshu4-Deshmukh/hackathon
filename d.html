@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women Safety Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .slider {
+            display: flex;
+            overflow: hidden;
+            border-radius: 10px; /* Rounded corners for slider */
+        }
+        .slider img {
+            min-width: 100%;
+            transition: transform 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between bg-pink-600 p-4 shadow-lg rounded-b-lg">
+        <div class="flex-1 text-white font-bold">Women Safety Dashboard</div>
+        <button id="sosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS</button>
+    </nav>
+
+    <!-- Slider -->
+    <div class="mt-6 relative w-full overflow-hidden mx-2">
+        <div id="slider" class="slider">
+            <img src="/img/wo.png" alt="Slide 1" class="h-48 object-cover rounded-t-lg">
+            <img src="/img/wo.png" alt="Slide 2" class="h-48 object-cover rounded-t-lg">
+            <img src="/img/wo.png" alt="Slide 3" class="h-48 object-cover rounded-t-lg">
+        </div>
+        <button id="prev" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-200">❮</button>
+        <button id="next" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-200">❯</button>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="container mx-auto mt-6 grid grid-cols-2 gap-4 px-2">
+        <div onclick="window.location.href='safety.html'" class="bg-pink-300 rounded-lg p-4 flex flex-col items-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+            <img src="/img/safe.png" alt="Logo 1" class="w-24 h-24 mb-4">
+            <h2 class="text-lg font-semibold">Safety Tutorial</h2>
+        </div>
+        <div class="bg-pink-300 rounded-lg p-4 flex flex-col items-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+            <img src="/img/w.png" alt="Logo 2" class="w-24 h-24 mb-4">
+            <h2 class="text-lg font-semibold">Add SOS Member</h2>
+        </div>
+        <div class="bg-pink-300 rounded-lg p-4 flex flex-col items-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+            <img src="/img/global-news.png" alt="Logo 3" class="w-24 h-24 mb-4">
+            <h2 class="text-lg font-semibold">Recent News</h2>
+        </div>
+        <div class="bg-pink-300 rounded-lg p-4 flex flex-col items-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+            <img src="logo4.png" alt="Logo 4" class="w-24 h-24 mb-4">
+            <h2 class="text-lg font-semibold">Feature 4</h2>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-pink-600 mt-6 py-4 flex justify-center items-center shadow-lg rounded-t-lg">
+        <button id="footerSosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS</button>
+    </footer>
+
+    <script>
+        // SOS Button Click Event
+        document.getElementById('sosButton').addEventListener('click', function() {
+            alert('SOS! Help is on the way!');
+        });
+
+        // Footer SOS Button Click Event
+        document.getElementById('footerSosButton').addEventListener('click', function() {
+            alert('SOS! Help is on the way!');
+        });
+
+        // Slider functionality
+        const slides = document.querySelectorAll('.slider img');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.style.transform = `translateX(${-index * 100}%)`;
+            });
+        }
+
+        document.getElementById('next').addEventListener('click', () => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        });
+
+        document.getElementById('prev').addEventListener('click', () => {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        });
+
+        // Auto slide functionality
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }, 5000); // Change slide every 5 seconds
+    </script>
+</body>
+</html>

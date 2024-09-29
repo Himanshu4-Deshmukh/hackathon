@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add SOS Member</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between bg-pink-600 p-4 shadow-lg rounded-b-lg">
+        <div class="flex-1 text-white font-bold">Add SOS Member</div>
+        <button id="sosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS</button>
+    </nav>
+
+    <!-- Add SOS Member Form -->
+    <div class="container mx-auto mt-6 p-4 max-w-md">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-semibold text-pink-600 mb-6 text-center">Enter SOS Member Details</h2>
+            <form>
+                <!-- Member Name -->
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
+                    <input type="text" id="name" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-500" placeholder="Enter Member Name" required>
+                </div>
+
+                <!-- Member Phone -->
+                <div class="mb-4">
+                    <label for="phone" class="block text-gray-700 font-bold mb-2">Phone Number</label>
+                    <input type="tel" id="phone" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-500" placeholder="Enter Phone Number" required>
+                </div>
+
+             
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" class="bg-pink-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-pink-700">Add Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-pink-600 mt-6 py-4 flex justify-center items-center shadow-lg rounded-t-lg">
+        <button id="footerSosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS</button>
+    </footer>
+
+    <script>
+        // SOS Button Click Event
+        document.getElementById('sosButton').addEventListener('click', function() {
+            sendWhatsAppMessage();
+        });
+
+        // Footer SOS Button Click Event
+        document.getElementById('footerSosButton').addEventListener('click', function() {
+            sendWhatsAppMessage();
+        });
+
+        // WhatsApp Message Sending
+        function sendWhatsAppMessage() {
+            const phoneNumber = '+1234567890'; // Replace with the SOS member's WhatsApp number
+            const message = 'This is an emergency! Please help!'; // Customize your emergency message
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Shake detection logic
+        let shakeThreshold = 15;
+        let lastTime = new Date();
+        let lastX = 0, lastY = 0, lastZ = 0;
+
+        if (window.DeviceMotionEvent) {
+            window.addEventListener('devicemotion', function(event) {
+                let acceleration = event.accelerationIncludingGravity;
+                let currentTime = new Date();
+                let timeDifference = currentTime - lastTime;
+
+                if (timeDifference > 100) {
+                    let deltaX = Math.abs(acceleration.x - lastX);
+                    let deltaY = Math.abs(acceleration.y - lastY);
+                    let deltaZ = Math.abs(acceleration.z - lastZ);
+
+                    if (deltaX + deltaY + deltaZ > shakeThreshold) {
+                        sendWhatsAppMessage();
+                    }
+
+                    lastTime = currentTime;
+                    lastX = acceleration.x;
+                    lastY = acceleration.y;
+                    lastZ = acceleration.z;
+                }
+            });
+        } else {
+            alert("Shake detection is not supported on this device.");
+        }
+    </script>
+</body>
+</html>

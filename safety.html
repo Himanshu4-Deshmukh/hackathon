@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women Safety Tutorials</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+         nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="flex items-center  justify-between bg-pink-600 p-4">
+        <div class="flex-1 text-white font-bold">Women Safety Tutorials</div>
+        <button id="sosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS</button>
+    </nav>
+
+    <!-- Tutorial Videos Section -->
+    <div class="container mx-auto mt-6 m-6">
+        <h2 class="text-2xl font-semibold text-center mb-6">Safety Tutorials</h2>
+        <div class="grid grid-cols-1 m-4 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Video 1 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <iframe width="100%" height="200" src="https://www.youtube.com/embed/EmKOOZIropE?si=IZIGQUNmdVTZoaeV" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="p-4">
+                    <h3 class="font-semibold">Tutorial Title 1</h3>
+                    <p class="text-gray-600">Brief description of the tutorial.</p>
+                </div>
+            </div>
+            <!-- Video 2 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <iframe width="100%" height="200" src="https://www.youtube.com/embed/KVpxP3ZZtAc?si=5OqTq1RFQpscBo0c" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="p-4">
+                    <h3 class="font-semibold">Tutorial Title 2</h3>
+                    <p class="text-gray-600">Brief description of the tutorial.</p>
+                </div>
+            </div>
+            <!-- Video 3 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <iframe width="100%" height="200" src="https://www.youtube.com/embed/J9lZ9OHdahg?si=wbuQvrxKtx93df-P" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="p-4">
+                    <h3 class="font-semibold">Tutorial Title 3</h3>
+                    <p class="text-gray-600">Brief description of the tutorial.</p>
+                </div>
+            </div>
+            <!-- Video 4 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <iframe width="100%" height="200" src="https://www.youtube.com/embed/EmKOOZIropE?si=5N1UT31E_k2gDuZc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="p-4">
+                    <h3 class="font-semibold">Tutorial Title 4</h3>
+                    <p class="text-gray-600">Brief description of the tutorial.</p>
+                </div>
+            </div>
+            <!-- Video 5 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <iframe width="100%" height="200" src="https://www.youtube.com/embed/KVpxP3ZZtAc?si=GE4o6UKDO3Jrz_N5" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="p-4">
+                    <h3 class="font-semibold">Tutorial Title 5</h3>
+                    <p class="text-gray-600">Brief description of the tutorial.</p>
+                </div>
+            </div>
+            <!-- Video 6 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <iframe width="100%" height="200" src="https://www.youtube.com/embed/YOUR_VIDEO_ID_6" frameborder="0" allowfullscreen></iframe>
+                <div class="p-4">
+                    <h3 class="font-semibold">Tutorial Title 6</h3>
+                    <p class="text-gray-600">Brief description of the tutorial.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-pink-600 mt-6 py-4 flex justify-center items-center">
+        <button id="footerSosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS</button>
+    </footer>
+
+    <script>
+        // SOS Button Click Event
+        document.getElementById('sosButton').addEventListener('click', function() {
+            alert('SOS! Help is on the way!');
+        });
+
+        // Footer SOS Button Click Event
+        document.getElementById('footerSosButton').addEventListener('click', function() {
+            alert('SOS! Help is on the way!');
+        });
+    </script>
+</body>
+</html>
