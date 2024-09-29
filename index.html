@@ -115,6 +115,109 @@
     </script>
 
 <script>
+    // Function to load saved SOS member details from localStorage
+    function loadMemberDetails() {
+        const savedName = localStorage.getItem('sosName');
+        const savedPhone = localStorage.getItem('sosPhone');
+        
+        if (savedName && savedPhone) {
+            document.getElementById('name').value = savedName;
+            document.getElementById('phone').value = savedPhone;
+            document.getElementById('editButton').classList.remove('hidden');
+        }
+    }
+
+    // Function to save SOS member details to localStorage
+    function saveMemberDetails(event) {
+        event.preventDefault();
+        
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+
+        if (name && phone) {
+            localStorage.setItem('sosName', name);
+            localStorage.setItem('sosPhone', phone);
+            alert('SOS Member details saved!');
+            document.getElementById('editButton').classList.remove('hidden');
+        } else {
+            alert('Please fill in all details.');
+        }
+    }
+
+    // Shake Detection and Location Sharing
+    let shakeThreshold = 400; // Sensitivity threshold for detecting a shake
+    let lastUpdate = 0;
+    let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
+    
+    if (window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', function(event) {
+            let acceleration = event.accelerationIncludingGravity;
+            let currentTime = new Date().getTime();
+            
+            if ((currentTime - lastUpdate) > 100) {
+                let diffTime = currentTime - lastUpdate;
+                lastUpdate = currentTime;
+    
+                x = acceleration.x;
+                y = acceleration.y;
+                z = acceleration.z;
+    
+                let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+    
+                if (speed > shakeThreshold) {
+                    // Get the user's location and then redirect to WhatsApp
+                    sendLocationAndMessage();
+                }
+    
+                lastX = x;
+                lastY = y;
+                lastZ = z;
+            }
+        });
+    } else {
+        alert("Shake detection is not supported on this device.");
+    }
+    
+    // Function to get current location and send WhatsApp message
+    function sendLocationAndMessage() {
+        const savedPhone = localStorage.getItem('sosPhone');
+        if (!savedPhone) {
+            alert("No SOS member details saved. Please add a member first.");
+            return;
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                let latitude = position.coords.latitude;
+                let longitude = position.coords.longitude;
+                
+                // Create Google Maps link with the current location
+                let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                
+                // WhatsApp URL with pre-filled message and location
+                let message = `SOS! Emergency Help!\nHere's my location: ${locationUrl}`;
+                
+                // Redirect to WhatsApp with the message and saved phone number
+                window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
+            }, function(error) {
+                alert("Unable to retrieve your location. Please enable location services.");
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    // Event Listeners
+    document.getElementById('sosForm').addEventListener('submit', saveMemberDetails);
+    document.getElementById('editButton').addEventListener('click', function() {
+        document.getElementById('name').focus();
+    });
+
+    // Load saved member details on page load
+    window.onload = loadMemberDetails;
+</script>
+
+<!-- <script>
     // Shake Detection and Location Sharing
     let shakeThreshold = 100; // Sensitivity threshold for detecting a shake
     let lastUpdate = 0;
@@ -171,7 +274,7 @@
             alert("Geolocation is not supported by this browser.");
         }
     }
-    </script>
+    </script> -->
     
 </body>
 </html>
