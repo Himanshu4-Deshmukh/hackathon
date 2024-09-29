@@ -111,40 +111,67 @@
             showSlide(currentSlide);
         }, 5000); // Change slide every 5 seconds
 
-// Shake Detection for Automatic WhatsApp Redirection
-let shakeThreshold = 15; // Sensitivity threshold for detecting a shake
-let lastUpdate = 0;
-let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
-
-if (window.DeviceMotionEvent) {
-    window.addEventListener('devicemotion', function(event) {
-        let acceleration = event.accelerationIncludingGravity;
-        let currentTime = new Date().getTime();
-        
-        if ((currentTime - lastUpdate) > 100) {
-            let diffTime = currentTime - lastUpdate;
-            lastUpdate = currentTime;
-
-            x = acceleration.x;
-            y = acceleration.y;
-            z = acceleration.z;
-
-            let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
-
-            if (speed > shakeThreshold) {
-                // Automatically redirect to WhatsApp with a pre-filled message
-                window.location.href = "https://wa.me/917385758928?text=SOS%20Emergency%20Help!";
-            }
-
-            lastX = x;
-            lastY = y;
-            lastZ = z;
-        }
-    });
-} else {
-    alert("Shake detection is not supported on this device.");
-}
 
     </script>
+
+<script>
+    // Shake Detection and Location Sharing
+    let shakeThreshold = 15; // Sensitivity threshold for detecting a shake
+    let lastUpdate = 0;
+    let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
+    
+    if (window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', function(event) {
+            let acceleration = event.accelerationIncludingGravity;
+            let currentTime = new Date().getTime();
+            
+            if ((currentTime - lastUpdate) > 100) {
+                let diffTime = currentTime - lastUpdate;
+                lastUpdate = currentTime;
+    
+                x = acceleration.x;
+                y = acceleration.y;
+                z = acceleration.z;
+    
+                let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+    
+                if (speed > shakeThreshold) {
+                    // Get the user's location and then redirect to WhatsApp
+                    sendLocationAndMessage();
+                }
+    
+                lastX = x;
+                lastY = y;
+                lastZ = z;
+            }
+        });
+    } else {
+        alert("Shake detection is not supported on this device.");
+    }
+    
+    // Function to get current location and send WhatsApp message
+    function sendLocationAndMessage() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                let latitude = position.coords.latitude;
+                let longitude = position.coords.longitude;
+                
+                // Create Google Maps link with the current location
+                let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                
+                // WhatsApp URL with pre-filled message and location
+                let message = `SOS! Emergency Help!\nHere's my location: ${locationUrl}`;
+                
+                // Redirect to WhatsApp with the message
+                window.location.href = `https://wa.me/911234567890?text=${encodeURIComponent(message)}`;
+            }, function(error) {
+                alert("Unable to retrieve your location. Please enable location services.");
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+    </script>
+    
 </body>
 </html>
