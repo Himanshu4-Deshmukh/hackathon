@@ -69,7 +69,7 @@
 
     <!-- Footer -->
     <footer class="bg-pink-600 mt-6 py-4 flex justify-center items-center shadow-lg rounded-t-lg">
-        <button id="footerSosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS/Emergency</button>
+        <button  window.location.href = `tel:${savedPhone}` id="footerSosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS/Emergency</button>
     </footer>
 
     
@@ -177,7 +177,7 @@
     } else {
         alert("Shake detection is not supported on this device.");
     }
-    
+
     // Function to get current location and send WhatsApp message
     function sendLocationAndMessage() {
         const savedPhone = localStorage.getItem('sosPhone');
@@ -196,7 +196,7 @@
                 let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
                 
                 // WhatsApp URL with pre-filled message, including the member's name and location
-                let message = `\n${savedName} Please help me, I'm trapped in an emergency situation!
+                let message = `SOS! Emergency Help!\n${savedName} Please help me, I'm trapped in an emergency situation!
 I don't know how to get out, and I'm really scared.
 Is anyone out there who can come to help?
 Please, I need assistance urgently!\nHere's my location: ${locationUrl}`;
@@ -209,6 +209,45 @@ Please, I need assistance urgently!\nHere's my location: ${locationUrl}`;
         } else {
             alert("Geolocation is not supported by this browser.");
         }
+    }
+
+    // Gesture Pattern Detection (e.g., detecting "Z" pattern)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    document.addEventListener('touchstart', function(event) {
+        touchStartX = event.changedTouches[0].screenX;
+        touchStartY = event.changedTouches[0].screenY;
+    }, false);
+
+    document.addEventListener('touchend', function(event) {
+        touchEndX = event.changedTouches[0].screenX;
+        touchEndY = event.changedTouches[0].screenY;
+        handleGesture();
+    }, false);
+
+    function handleGesture() {
+        // Detect a simple "Z" pattern or any custom pattern
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+
+        if (deltaX > 100 && deltaY > 100) { // Example of a diagonal gesture
+            makeEmergencyCall();
+        }
+    }
+
+    // Function to trigger the call
+    function makeEmergencyCall() {
+        const savedPhone = localStorage.getItem('sosPhone');
+        if (!savedPhone) {
+            alert("No SOS member number saved. Please add a member first.");
+            return;
+        }
+
+        // Open the phone dialer with the saved number
+        window.location.href = `tel:${savedPhone}`;
     }
 
     // Event Listeners
