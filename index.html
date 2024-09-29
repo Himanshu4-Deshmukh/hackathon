@@ -196,7 +196,10 @@
                 let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
                 
                 // WhatsApp URL with pre-filled message, including the member's name and location
-                let message = `SOS! Emergency Help!\n${savedName} needs help!\nHere's my location: ${locationUrl}`;
+                let message = `\n${savedName} Please help me, I'm trapped in an emergency situation!
+I don't know how to get out, and I'm really scared.
+Is anyone out there who can come to help?
+Please, I need assistance urgently!\nHere's my location: ${locationUrl}`;
                 
                 // Redirect to WhatsApp with the message and saved phone number
                 window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
