@@ -32,7 +32,7 @@
     <script>
         async function fetchNews() {
             try {
-                const response = await fetch('http://localhost:3000/scrape'); // Your backend endpoint
+                const response = await fetch('https://back-ogt7.onrender.com/scrape'); // Your backend endpoint
                 const newsItems = await response.json();
 
                 const newsContainer = document.getElementById('news-container');
