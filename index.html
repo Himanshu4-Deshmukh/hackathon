@@ -112,37 +112,37 @@
         }, 5000); // Change slide every 5 seconds
 
         // Shake Detection
-        // let shakeThreshold = 15; // Sensitivity threshold for detecting a shake
-        // let lastUpdate = 0;
-        // let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
+        let shakeThreshold = 15; // Sensitivity threshold for detecting a shake
+        let lastUpdate = 0;
+        let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
 
-        // if (window.DeviceMotionEvent) {
-        //     window.addEventListener('devicemotion', function(event) {
-        //         let acceleration = event.accelerationIncludingGravity;
-        //         let currentTime = new Date().getTime();
-        //         if ((currentTime - lastUpdate) > 100) {
-        //             let diffTime = currentTime - lastUpdate;
-        //             lastUpdate = currentTime;
+        if (window.DeviceMotionEvent) {
+            window.addEventListener('devicemotion', function(event) {
+                let acceleration = event.accelerationIncludingGravity;
+                let currentTime = new Date().getTime();
+                if ((currentTime - lastUpdate) > 100) {
+                    let diffTime = currentTime - lastUpdate;
+                    lastUpdate = currentTime;
 
-        //             x = acceleration.x;
-        //             y = acceleration.y;
-        //             z = acceleration.z;
+                    x = acceleration.x;
+                    y = acceleration.y;
+                    z = acceleration.z;
 
-        //             let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+                    let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
 
-        //             if (speed > shakeThreshold) {
-        //                 // Redirect to WhatsApp when shake is detected
-        //                 window.location.href = "https://wa.me/911234567890?text=SOS%20Emergency%20Help!";
-        //             }
+                    if (speed > shakeThreshold) {
+                        // Redirect to WhatsApp when shake is detected
+                        window.location.href = "https://wa.me/917385758928?text=SOS%20Emergency%20Help!";
+                    }
 
-        //             lastX = x;
-        //             lastY = y;
-        //             lastZ = z;
-        //         }
-        //     });
-        // } else {
-        //     alert("Shake detection is not supported on this device.");
-        // }
+                    lastX = x;
+                    lastY = y;
+                    lastZ = z;
+                }
+            });
+        } else {
+            alert("Shake detection is not supported on this device.");
+        }
     </script>
 </body>
 </html>
