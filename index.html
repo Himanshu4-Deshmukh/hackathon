@@ -61,16 +61,66 @@
         <button id="footerSosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS</button>
     </footer>
 
+
     <script>
         // SOS Button Click Event
         document.getElementById('sosButton').addEventListener('click', function() {
-            alert('SOS! Help is on the way!');
+            sendWhatsAppMessage();
         });
 
         // Footer SOS Button Click Event
         document.getElementById('footerSosButton').addEventListener('click', function() {
-            alert('SOS! Help is on the way!');
+            sendWhatsAppMessage();
         });
+
+        // WhatsApp Message Sending
+        function sendWhatsAppMessage() {
+            const phoneNumber = '+1234567890'; // Replace with the SOS member's WhatsApp number
+            const message = 'This is an emergency! Please help!'; // Customize your emergency message
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Shake detection logic
+        let shakeThreshold = 15;
+        let lastTime = new Date();
+        let lastX = 0, lastY = 0, lastZ = 0;
+
+        if (window.DeviceMotionEvent) {
+            window.addEventListener('devicemotion', function(event) {
+                let acceleration = event.accelerationIncludingGravity;
+                let currentTime = new Date();
+                let timeDifference = currentTime - lastTime;
+
+                if (timeDifference > 100) {
+                    let deltaX = Math.abs(acceleration.x - lastX);
+                    let deltaY = Math.abs(acceleration.y - lastY);
+                    let deltaZ = Math.abs(acceleration.z - lastZ);
+
+                    if (deltaX + deltaY + deltaZ > shakeThreshold) {
+                        sendWhatsAppMessage();
+                    }
+
+                    lastTime = currentTime;
+                    lastX = acceleration.x;
+                    lastY = acceleration.y;
+                    lastZ = acceleration.z;
+                }
+            });
+        } else {
+            alert("Shake detection is not supported on this device.");
+        }
+    </script>
+    <script>
+        // SOS Button Click Event
+        // document.getElementById('sosButton').addEventListener('click', function() {
+        //     alert('SOS! Help is on the way!');
+        // });
+
+        // Footer SOS Button Click Event
+        // document.getElementById('footerSosButton').addEventListener('click', function() {
+        //     alert('SOS! Help is on the way!');
+        // });
 
         // Slider functionality
         const slides = document.querySelectorAll('.slider img');
