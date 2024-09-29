@@ -46,59 +46,78 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <!-- <footer class="bg-pink-600 mt-6 py-4 flex justify-center items-center shadow-lg rounded-t-lg">
-        <button id="footerSosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS</button>
-    </footer> -->
-
     <script>
-        // SOS Button Click Event
-        document.getElementById('sosButton').addEventListener('click', function() {
-            sendWhatsAppMessage();
-        });
-
-        // Footer SOS Button Click Event
-        document.getElementById('footerSosButton').addEventListener('click', function() {
-            sendWhatsAppMessage();
-        });
-
-        // WhatsApp Message Sending
-        function sendWhatsAppMessage() {
-            const phoneNumber = '+1234567890'; // Replace with the SOS member's WhatsApp number
-            const message = 'This is an emergency! Please help!'; // Customize your emergency message
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-        // Shake detection logic
-        let shakeThreshold = 15;
-        let lastTime = new Date();
-        let lastX = 0, lastY = 0, lastZ = 0;
-
+        // Set a higher shake threshold for high-intensity shakes
+        let shakeThreshold = 25; // Increase this value for high intensity detection
+        let lastUpdate = 0;
+        let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
+        
+        // Array of WhatsApp numbers to send the message to
+        let phoneNumbers = ["917385758928", "918080130564", "919021084589"];
+        
         if (window.DeviceMotionEvent) {
             window.addEventListener('devicemotion', function(event) {
                 let acceleration = event.accelerationIncludingGravity;
-                let currentTime = new Date();
-                let timeDifference = currentTime - lastTime;
-
-                if (timeDifference > 100) {
-                    let deltaX = Math.abs(acceleration.x - lastX);
-                    let deltaY = Math.abs(acceleration.y - lastY);
-                    let deltaZ = Math.abs(acceleration.z - lastZ);
-
-                    if (deltaX + deltaY + deltaZ > shakeThreshold) {
-                        sendWhatsAppMessage();
+                let currentTime = new Date().getTime();
+                
+                if ((currentTime - lastUpdate) > 100) {
+                    let diffTime = currentTime - lastUpdate;
+                    lastUpdate = currentTime;
+        
+                    x = acceleration.x;
+                    y = acceleration.y;
+                    z = acceleration.z;
+        
+                    // Calculate shake speed
+                    let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+        
+                    // Only trigger the script when speed exceeds the high-intensity threshold
+                    if (speed > shakeThreshold) {
+                        // Get the user's location and send WhatsApp message
+                        sendLocationAndMessage();
                     }
-
-                    lastTime = currentTime;
-                    lastX = acceleration.x;
-                    lastY = acceleration.y;
-                    lastZ = acceleration.z;
+        
+                    lastX = x;
+                    lastY = y;
+                    lastZ = z;
                 }
             });
         } else {
             alert("Shake detection is not supported on this device.");
         }
-    </script>
+        
+        // Function to get current location and send WhatsApp message to multiple numbers
+        function sendLocationAndMessage() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let latitude = position.coords.latitude;
+                    let longitude = position.coords.longitude;
+                    
+                    // Create Google Maps link with the current location
+                    let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                    
+                    // Message content
+                    let message = `SOS! Emergency Help!\nHere's my location: ${locationUrl}`;
+        
+                    // Send message to each number in the array
+                    phoneNumbers.forEach((number, index) => {
+                        // Slight delay between each message to prevent browser blocking
+                        setTimeout(() => {
+                            let whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+                            window.open(whatsappUrl, '_blank'); // Opens in a new tab
+                        }, index * 2000); // 2-second delay between each message
+                    });
+        
+                }, function(error) {
+                    alert("Unable to retrieve your location. Please enable location services.");
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+        }
+        }
+        </script>
+        
+
+ 
 </body>
 </html>
