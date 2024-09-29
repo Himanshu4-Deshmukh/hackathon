@@ -69,7 +69,7 @@
 
     <!-- Footer -->
     <footer class="bg-pink-600 mt-6 py-4 flex justify-center items-center shadow-lg rounded-t-lg">
-        <button  window.location.href = `tel:${savedPhone}` id="footerSosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS/Emergency</button>
+        <button   id="footerSosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS/Emergency</button>
     </footer>
 
     
@@ -77,12 +77,12 @@
     <script>
         // SOS Button Click Event
         document.getElementById('sosButton').addEventListener('click', function() {
-            alert('SOS! Help is on the way!');
+            window.location.href = `tel:${savedPhone}`;
         });
 
         // Footer SOS Button Click Event
         document.getElementById('footerSosButton').addEventListener('click', function() {
-            alert('SOS! Help is on the way!');
+          window.location.href = `tel:${savedPhone}`;
         });
 
         // Slider functionality
