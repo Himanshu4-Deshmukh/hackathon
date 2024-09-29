@@ -3,193 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add SOS Member</title>
+    <title>Gesture Call</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        .hidden {
-            display: none;
+        #drawingArea {
+            border: 2px dashed pink;
+            height: 300px;
+            position: relative;
         }
     </style>
 </head>
 <body class="bg-gray-100">
 
-    <!-- Navbar -->
-    <nav class="flex items-center justify-between bg-pink-600 p-4 shadow-lg rounded-b-lg">
-        <div class="flex-1 text-white font-bold">Add SOS Member</div>
-        <button id="sosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS</button>
-    </nav>
-
-    <!-- Add/Edit SOS Member Form -->
-    <div class="container mx-auto mt-6 p-4 max-w-md">
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-xl font-semibold text-pink-600 mb-6 text-center">Enter SOS Member Details</h2>
-            <form id="sosForm">
-                <!-- Member Name -->
-                <div class="mb-4">
-                    <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
-                    <input type="text" id="name" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-500" placeholder="Enter Member Name" required>
-                </div>
-
-                <!-- Member Phone -->
-                <div class="mb-4">
-                    <label for="phone" class="block text-gray-700 font-bold mb-2">Phone Number</label>
-                    <input type="tel" id="phone" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-500" placeholder="Enter Phone Number" required>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="text-center">
-                    <button type="submit" class="bg-pink-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-pink-700">Save Member</button>
-                </div>
-            </form>
-
-            <!-- Edit Button -->
-            <div class="text-center mt-4">
-                <button id="editButton" class="bg-yellow-500 text-white font-bold px-6 py-2 rounded-lg hover:bg-yellow-600 hidden">Edit Member</button>
-            </div>
-        </div>
-    </div>
+    <!-- Drawing Area -->
+    <div id="drawingArea" class="mx-auto mt-6 p-4 max-w-md"></div>
 
     <script>
-        // Function to load saved SOS member details from localStorage
-        function loadMemberDetails() {
-            const savedName = localStorage.getItem('sosName');
-            const savedPhone = localStorage.getItem('sosPhone');
-            
-            if (savedName && savedPhone) {
-                document.getElementById('name').value = savedName;
-                document.getElementById('phone').value = savedPhone;
-                document.getElementById('editButton').classList.remove('hidden');
-            }
-        }
+        let touchStartX, touchStartY, touchEndX, touchEndY;
 
-        // Function to save SOS member details to localStorage
-        function saveMemberDetails(event) {
-            event.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
+        const drawingArea = document.getElementById('drawingArea');
 
-            if (name && phone) {
-                localStorage.setItem('sosName', name);
-                localStorage.setItem('sosPhone', phone);
-                alert('SOS Member details saved!');
-                document.getElementById('editButton').classList.remove('hidden');
-            } else {
-                alert('Please fill in all details.');
-            }
-        }
-
-        // Shake Detection and Location Sharing
-        let shakeThreshold = 100; // Sensitivity threshold for detecting a shake
-        let lastUpdate = 0;
-        let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
-        
-        if (window.DeviceMotionEvent) {
-            window.addEventListener('devicemotion', function(event) {
-                let acceleration = event.accelerationIncludingGravity;
-                let currentTime = new Date().getTime();
-                
-                if ((currentTime - lastUpdate) > 100) {
-                    let diffTime = currentTime - lastUpdate;
-                    lastUpdate = currentTime;
-        
-                    x = acceleration.x;
-                    y = acceleration.y;
-                    z = acceleration.z;
-        
-                    let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
-        
-                    if (speed > shakeThreshold) {
-                        // Get the user's location and then redirect to WhatsApp
-                        sendLocationAndMessage();
-                    }
-        
-                    lastX = x;
-                    lastY = y;
-                    lastZ = z;
-                }
-            });
-        } else {
-            alert("Shake detection is not supported on this device.");
-        }
-
-        // Function to get current location and send WhatsApp message
-        function sendLocationAndMessage() {
-            const savedPhone = localStorage.getItem('sosPhone');
-            const savedName = localStorage.getItem('sosName');
-            if (!savedPhone || !savedName) {
-                alert("No SOS member details saved. Please add a member first.");
-                return;
-            }
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    let latitude = position.coords.latitude;
-                    let longitude = position.coords.longitude;
-                    
-                    // Create Google Maps link with the current location
-                    let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
-                    
-                    // WhatsApp URL with pre-filled message, including the member's name and location
-                    let message = `SOS! Emergency Help!\n${savedName} needs help!\nHere's my location: ${locationUrl}`;
-                    
-                    // Redirect to WhatsApp with the message and saved phone number
-                    window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
-                }, function(error) {
-                    alert("Unable to retrieve your location. Please enable location services.");
-                });
-            } else {
-                alert("Geolocation is not supported by this browser.");
-            }
-        }
-
-        // Gesture Pattern Detection (e.g., detecting "Z" pattern)
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let touchEndX = 0;
-        let touchEndY = 0;
-
-        document.addEventListener('touchstart', function(event) {
-            touchStartX = event.changedTouches[0].screenX;
-            touchStartY = event.changedTouches[0].screenY;
-        }, false);
-
-        document.addEventListener('touchend', function(event) {
-            touchEndX = event.changedTouches[0].screenX;
-            touchEndY = event.changedTouches[0].screenY;
-            handleGesture();
-        }, false);
-
-        function handleGesture() {
-            // Detect a simple "Z" pattern or any custom pattern
-            const deltaX = touchEndX - touchStartX;
-            const deltaY = touchEndY - touchStartY;
-
-            if (deltaX > 100 && deltaY > 100) { // Example of a diagonal gesture
-                makeEmergencyCall();
-            }
-        }
-
-        // Function to trigger the call
-        function makeEmergencyCall() {
-            const savedPhone = localStorage.getItem('sosPhone');
-            if (!savedPhone) {
-                alert("No SOS member number saved. Please add a member first.");
-                return;
-            }
-
-            // Open the phone dialer with the saved number
-            window.location.href = `tel:${savedPhone}`;
-        }
-
-        // Event Listeners
-        document.getElementById('sosForm').addEventListener('submit', saveMemberDetails);
-        document.getElementById('editButton').addEventListener('click', function() {
-            document.getElementById('name').focus();
+        drawingArea.addEventListener('touchstart', function (event) {
+            const touch = event.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
         });
 
-        // Load saved member details on page load
-        window.onload = loadMemberDetails;
+        drawingArea.addEventListener('touchend', function (event) {
+            const touch = event.changedTouches[0];
+            touchEndX = touch.clientX;
+            touchEndY = touch.clientY;
+            detectGesture();
+        });
+
+        function detectGesture() {
+            // Simple example of a gesture check (you can replace this with your pattern logic)
+            if (touchEndY < touchStartY && Math.abs(touchEndX - touchStartX) < 100) {
+                // Gesture matched (e.g., an upward swipe)
+                makeCall();
+            }
+        }
+
+        function makeCall() {
+            const number = '917385758928'; // Replace with the number from your form or storage
+            window.location.href = `tel:${number}`; // Directly initiate the call
+        }
     </script>
 </body>
 </html>
