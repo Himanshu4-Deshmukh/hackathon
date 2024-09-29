@@ -75,15 +75,25 @@
     
 
     <script>
-        // SOS Button Click Event
-        document.getElementById('sosButton').addEventListener('click', function() {
-            window.location.href = `tel:${savedPhone}`;
-        });
 
-        // Footer SOS Button Click Event
-        document.getElementById('footerSosButton').addEventListener('click', function() {
-          window.location.href = `tel:${savedPhone}`;
-        });
+// SOS Button Click Event
+document.getElementById('sosButton').addEventListener('click', function() {
+    if (savedPhone) {
+        window.location.href = `tel:${savedPhone}`;
+    } else {
+        alert('Phone number not available!');
+    }
+});
+
+// Footer SOS Button Click Event
+document.getElementById('footerSosButton').addEventListener('click', function() {
+    if (savedPhone) {
+        window.location.href = `tel:${savedPhone}`;
+    } else {
+        alert('Phone number not available!');
+    }
+});
+
 
         // Slider functionality
         const slides = document.querySelectorAll('.slider img');
