@@ -80,7 +80,7 @@
         }
 
         // Shake Detection and Location Sharing
-        let shakeThreshold = 800; // Sensitivity threshold for detecting a shake
+        let shakeThreshold = 100; // Sensitivity threshold for detecting a shake
         let lastUpdate = 0;
         let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
         
@@ -112,7 +112,7 @@
         } else {
             alert("Shake detection is not supported on this device.");
         }
-        
+
         // Function to get current location and send WhatsApp message
         function sendLocationAndMessage() {
             const savedPhone = localStorage.getItem('sosPhone');
@@ -141,6 +141,45 @@
             } else {
                 alert("Geolocation is not supported by this browser.");
             }
+        }
+
+        // Gesture Pattern Detection (e.g., detecting "Z" pattern)
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+
+        document.addEventListener('touchstart', function(event) {
+            touchStartX = event.changedTouches[0].screenX;
+            touchStartY = event.changedTouches[0].screenY;
+        }, false);
+
+        document.addEventListener('touchend', function(event) {
+            touchEndX = event.changedTouches[0].screenX;
+            touchEndY = event.changedTouches[0].screenY;
+            handleGesture();
+        }, false);
+
+        function handleGesture() {
+            // Detect a simple "Z" pattern or any custom pattern
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+
+            if (deltaX > 100 && deltaY > 100) { // Example of a diagonal gesture
+                makeEmergencyCall();
+            }
+        }
+
+        // Function to trigger the call
+        function makeEmergencyCall() {
+            const savedPhone = localStorage.getItem('sosPhone');
+            if (!savedPhone) {
+                alert("No SOS member number saved. Please add a member first.");
+                return;
+            }
+
+            // Open the phone dialer with the saved number
+            window.location.href = `tel:${savedPhone}`;
         }
 
         // Event Listeners
