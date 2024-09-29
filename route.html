@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe Route Finder</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Leaflet.js CSS for map display -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between bg-pink-600 p-4 shadow-lg">
+        <div class="text-white font-bold text-lg">Safe Route Finder</div>
+        <button class="text-white font-bold text-lg">Menu</button>
+    </nav>
+
+    <!-- Input Container -->
+    <div class="container mx-auto p-4">
+        <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Find the Safest Route</h2>
+        <div class="flex flex-col sm:flex-row justify-center items-center mb-4 space-y-4 sm:space-y-0 sm:space-x-4">
+            <input type="text" id="start" class="w-full sm:w-64 p-2 border border-gray-300 rounded focus:outline-none focus:border-pink-500" placeholder="Enter starting point" />
+            <input type="text" id="end" class="w-full sm:w-64 p-2 border border-gray-300 rounded focus:outline-none focus:border-pink-500" placeholder="Enter destination" />
+            <button onclick="findSafeRoute()" class="w-full sm:w-auto bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 focus:outline-none">Find Safe Route</button>
+        </div>
+
+        <!-- Map Container -->
+        <div id="map" class="rounded-lg shadow-md"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-pink-600 py-4 text-white flex justify-center items-center mt-6 shadow-lg">
+        <p>&copy; 2024 Safe Route Finder</p>
+    </footer>
+
+    <!-- Leaflet.js for displaying the map -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <script>
+        // Initialize the map
+        const map = L.map('map').setView([28.6139, 77.2090], 13); // Default to Delhi, India
+
+        // Add OpenStreetMap tiles (free and open-source)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Variable to store the route layer
+        let routeLayer = null;
+
+        // Function to find the safe route between two points
+        async function findSafeRoute() {
+            const start = document.getElementById('start').value;
+            const end = document.getElementById('end').value;
+
+            if (!start || !end) {
+                alert("Please enter both starting point and destination.");
+                return;
+            }
+
+            // Get the latitude and longitude for the start and end points using Nominatim (free OSM geocoding API)
+            const startCoordinates = await getCoordinates(start);
+            const endCoordinates = await getCoordinates(end);
+
+            // If coordinates are successfully retrieved, call OpenRouteService to calculate the route
+            if (startCoordinates && endCoordinates) {
+                const orsUrl = `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e1855a339408414cb773554a523388c0&start=${startCoordinates.lon},${startCoordinates.lat}&end=${endCoordinates.lon},${endCoordinates.lat}`;
+
+                fetch(orsUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        const route = data.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+
+                        // Remove any previous route layer
+                        if (routeLayer) {
+                            map.removeLayer(routeLayer);
+                        }
+
+                        // Draw the new route on the map
+                        routeLayer = L.polyline(route, { color: 'pink' }).addTo(map);
+                        map.fitBounds(routeLayer.getBounds());
+                    })
+                    .catch(err => {
+                        console.error("Error fetching route:", err);
+                    });
+            }
+        }
+
+        // Function to get coordinates (latitude and longitude) from an address using Nominatim (free geocoding)
+        async function getCoordinates(address) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${address}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data && data.length > 0) {
+                return {
+                    lat: data[0].lat,
+                    lon: data[0].lon
+                };
+            } else {
+                alert("Address not found.");
+                return null;
+            }
+        }
+    </script>
+</body>
+</html>
