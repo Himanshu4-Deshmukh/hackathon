@@ -19,11 +19,11 @@
         <button id="sosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS</button>
     </nav>
 
-    <!-- Add SOS Member Form -->
+    <!-- Add/Edit SOS Member Form -->
     <div class="container mx-auto mt-6 p-4 max-w-md">
         <div class="bg-white p-6 rounded-lg shadow-lg">
             <h2 class="text-xl font-semibold text-pink-600 mb-6 text-center">Enter SOS Member Details</h2>
-            <form>
+            <form id="sosForm">
                 <!-- Member Name -->
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
@@ -36,24 +36,53 @@
                     <input type="tel" id="phone" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-500" placeholder="Enter Phone Number" required>
                 </div>
 
-             
-
                 <!-- Submit Button -->
                 <div class="text-center">
-                    <button type="submit" class="bg-pink-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-pink-700">Add Member</button>
+                    <button type="submit" class="bg-pink-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-pink-700">Save Member</button>
                 </div>
             </form>
+
+            <!-- Edit Button -->
+            <div class="text-center mt-4">
+                <button id="editButton" class="bg-yellow-500 text-white font-bold px-6 py-2 rounded-lg hover:bg-yellow-600 hidden">Edit Member</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Set a higher shake threshold for high-intensity shakes
-        let shakeThreshold = 25; // Increase this value for high intensity detection
+        // Function to load saved SOS member details from localStorage
+        function loadMemberDetails() {
+            const savedName = localStorage.getItem('sosName');
+            const savedPhone = localStorage.getItem('sosPhone');
+            
+            if (savedName && savedPhone) {
+                document.getElementById('name').value = savedName;
+                document.getElementById('phone').value = savedPhone;
+                document.getElementById('editButton').classList.remove('hidden');
+            }
+        }
+
+        // Function to save SOS member details to localStorage
+        function saveMemberDetails(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+
+            if (name && phone) {
+                localStorage.setItem('sosName', name);
+                localStorage.setItem('sosPhone', phone);
+                alert('SOS Member details saved!');
+                document.getElementById('editButton').classList.remove('hidden');
+            } else {
+                alert('Please fill in all details.');
+            }
+        }
+
+        // Shake Detection and Location Sharing
+        let shakeThreshold = 100; // Sensitivity threshold for detecting a shake
         let lastUpdate = 0;
         let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
-        
-        // Array of WhatsApp numbers to send the message to
-        let phoneNumbers = ["917385758928", "918080130564", "919021084589"];
         
         if (window.DeviceMotionEvent) {
             window.addEventListener('devicemotion', function(event) {
@@ -68,12 +97,10 @@
                     y = acceleration.y;
                     z = acceleration.z;
         
-                    // Calculate shake speed
                     let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
         
-                    // Only trigger the script when speed exceeds the high-intensity threshold
                     if (speed > shakeThreshold) {
-                        // Get the user's location and send WhatsApp message
+                        // Get the user's location and then redirect to WhatsApp
                         sendLocationAndMessage();
                     }
         
@@ -86,8 +113,14 @@
             alert("Shake detection is not supported on this device.");
         }
         
-        // Function to get current location and send WhatsApp message to multiple numbers
+        // Function to get current location and send WhatsApp message
         function sendLocationAndMessage() {
+            const savedPhone = localStorage.getItem('sosPhone');
+            if (!savedPhone) {
+                alert("No SOS member details saved. Please add a member first.");
+                return;
+            }
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     let latitude = position.coords.latitude;
@@ -96,28 +129,27 @@
                     // Create Google Maps link with the current location
                     let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
                     
-                    // Message content
+                    // WhatsApp URL with pre-filled message and location
                     let message = `SOS! Emergency Help!\nHere's my location: ${locationUrl}`;
-        
-                    // Send message to each number in the array
-                    phoneNumbers.forEach((number, index) => {
-                        // Slight delay between each message to prevent browser blocking
-                        setTimeout(() => {
-                            let whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-                            window.open(whatsappUrl, '_blank'); // Opens in a new tab
-                        }, index * 2000); // 2-second delay between each message
-                    });
-        
+                    
+                    // Redirect to WhatsApp with the message and saved phone number
+                    window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
                 }, function(error) {
                     alert("Unable to retrieve your location. Please enable location services.");
                 });
             } else {
                 alert("Geolocation is not supported by this browser.");
+            }
         }
-        }
-        </script>
-        
 
- 
+        // Event Listeners
+        document.getElementById('sosForm').addEventListener('submit', saveMemberDetails);
+        document.getElementById('editButton').addEventListener('click', function() {
+            document.getElementById('name').focus();
+        });
+
+        // Load saved member details on page load
+        window.onload = loadMemberDetails;
+    </script>
 </body>
 </html>
