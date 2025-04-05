@@ -140,15 +140,19 @@
         document.getElementById('sosButton').addEventListener('click', function() {
             const savedPhone = localStorage.getItem('sosPhone');
             if (savedPhone) {
-                // Trigger emergency actions
-                triggerEmergencyActions(savedPhone);
+                // First send SMS
+                sendSMS(savedPhone);
+                // Then initiate call after a short delay
+                setTimeout(() => {
+                    window.location.href = `tel:${savedPhone}`;
+                }, 1000);
             } else {
                 alert('No emergency contact found! Please add one in SOS Contacts.');
             }
         });
 
-        // Function to handle all emergency actions
-        function triggerEmergencyActions(phoneNumber) {
+        // Send SMS function
+        function sendSMS(phoneNumber) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     let latitude = position.coords.latitude;
@@ -162,74 +166,17 @@
                     // SMS message
                     let message = `SOS! EMERGENCY! ${savedName}, I need immediate help! My location: ${locationUrl}`;
                     
-                    // Create a hidden anchor element for SMS
-                    try {
-                        // For Android devices - create hidden link and click
-                        const smsLink = document.createElement('a');
-                        smsLink.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
-                        smsLink.style.display = 'none';
-                        document.body.appendChild(smsLink);
-                        smsLink.click();
-                        document.body.removeChild(smsLink);
-                        
-                        // Call after a short delay
-                        setTimeout(() => {
-                            const callLink = document.createElement('a');
-                            callLink.href = `tel:${phoneNumber}`;
-                            callLink.style.display = 'none';
-                            document.body.appendChild(callLink);
-                            callLink.click();
-                            document.body.removeChild(callLink);
-                        }, 1500);
-                        
-                        // WhatsApp after another delay
-                        setTimeout(() => {
-                            const whatsappLink = document.createElement('a');
-                            // Using target="_blank" to open in new tab to avoid app redirect issues
-                            whatsappLink.setAttribute('target', '_blank');
-                            whatsappLink.href = `https://wa.me/${phoneNumber.replace(/\+/g, '')}?text=${encodeURIComponent(message)}`;
-                            whatsappLink.style.display = 'none';
-                            document.body.appendChild(whatsappLink);
-                            whatsappLink.click();
-                            document.body.removeChild(whatsappLink);
-                        }, 3000);
-                    } catch (error) {
-                        console.error("Error triggering emergency actions:", error);
-                        alert("There was an error sending emergency alerts. Please try calling emergency contacts directly.");
-                    }
-                    
+                    // Send SMS using sms: protocol
+                    window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
                 }, function(error) {
-                    // If location access fails, still proceed with emergency actions
+                    // If location access fails, still send SMS without location
                     let message = "SOS! EMERGENCY! I need immediate help!";
-                    
-                    // Use the same approach but without location
-                    try {
-                        // For SMS
-                        const smsLink = document.createElement('a');
-                        smsLink.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
-                        smsLink.style.display = 'none';
-                        document.body.appendChild(smsLink);
-                        smsLink.click();
-                        document.body.removeChild(smsLink);
-                        
-                        // For call
-                        setTimeout(() => {
-                            const callLink = document.createElement('a');
-                            callLink.href = `tel:${phoneNumber}`;
-                            callLink.style.display = 'none';
-                            document.body.appendChild(callLink);
-                            callLink.click();
-                            document.body.removeChild(callLink);
-                        }, 1500);
-                    } catch (error) {
-                        console.error("Error triggering emergency actions:", error);
-                        alert("There was an error sending emergency alerts. Please try calling emergency contacts directly.");
-                    }
+                    window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
                 });
             } else {
-                // Fallback for browsers without geolocation
-                alert("Geolocation is not supported by this browser. Initiating emergency call only.");
-                window.location.href = `tel:${phoneNumber}`;
+                // If geolocation not supported, still send SMS without location
+                let message = "SOS! EMERGENCY! I need immediate help!";
+                window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
             }
         }
 
@@ -297,13 +244,8 @@
                     let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
         
                     if (speed > shakeThreshold) {
-                        // Use the same function for trigger emergency actions
-                        const savedPhone = localStorage.getItem('sosPhone');
-                        if (savedPhone) {
-                            triggerEmergencyActions(savedPhone);
-                        } else {
-                            alert("No SOS member number saved. Please add a member first.");
-                        }
+                        // Trigger both SMS and WhatsApp alert
+                        sendEmergencyAlerts();
                     }
         
                     lastX = x;
@@ -313,6 +255,65 @@
             });
         } else {
             console.log("Shake detection is not supported on this device.");
+        }
+
+        // Function to send both SMS and WhatsApp alerts
+        function sendEmergencyAlerts() {
+            const savedPhone = localStorage.getItem('sosPhone');
+            const savedName = localStorage.getItem('sosName');
+            
+            if (!savedPhone || !savedName) {
+                alert("No SOS member details saved. Please add a member first.");
+                return;
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let latitude = position.coords.latitude;
+                    let longitude = position.coords.longitude;
+                    
+                    // Create Google Maps link with the current location
+                    let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                    
+                    // Emergency message
+                    let message = `SOS! Emergency Help!\n${savedName} Please help me, I'm trapped in an emergency situation!
+I don't know how to get out, and I'm really scared.
+Please, I need assistance urgently!\nHere's my location: ${locationUrl}`;
+                    
+                    // First send SMS
+                    sendSMS(savedPhone);
+                    
+                    // Then redirect to WhatsApp after a short delay
+                    setTimeout(() => {
+                        window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
+                    }, 1500);
+                    
+                }, function(error) {
+                    alert("Unable to retrieve your location. Sending alert without location.");
+                    // Still send messages without location
+                    let message = "SOS! Emergency Help! I need urgent assistance!";
+                    
+                    // Send SMS first
+                    window.location.href = `sms:${savedPhone}?body=${encodeURIComponent(message)}`;
+                    
+                    // Then redirect to WhatsApp after a short delay
+                    setTimeout(() => {
+                        window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
+                    }, 1500);
+                });
+            } else {
+                alert("Geolocation is not supported by this browser. Sending alert without location.");
+                // Still send messages without location
+                let message = "SOS! Emergency Help! I need urgent assistance!";
+                
+                // Send SMS first
+                window.location.href = `sms:${savedPhone}?body=${encodeURIComponent(message)}`;
+                
+                // Then redirect to WhatsApp after a short delay
+                setTimeout(() => {
+                    window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
+                }, 1500);
+            }
         }
 
         // Gesture Pattern Detection (e.g., detecting "Z" pattern)
@@ -333,15 +334,20 @@
         }, false);
 
         function handleGesture() {
-            // Detect a simple diagonal gesture
+            // Detect a simple "Z" pattern or any custom pattern
             const deltaX = touchEndX - touchStartX;
             const deltaY = touchEndY - touchStartY;
 
-            if (deltaX > 100 && deltaY > 100) { // Diagonal gesture
-                // Use the unified emergency actions function
+            if (deltaX > 100 && deltaY > 100) { // Example of a diagonal gesture
+                // Trigger both SMS and emergency call
                 const savedPhone = localStorage.getItem('sosPhone');
                 if (savedPhone) {
-                    triggerEmergencyActions(savedPhone);
+                    // First send SMS
+                    sendSMS(savedPhone);
+                    // Then initiate call after a short delay
+                    setTimeout(() => {
+                        window.location.href = `tel:${savedPhone}`;
+                    }, 1000);
                 } else {
                     alert("No SOS member number saved. Please add a member first.");
                 }
