@@ -53,30 +53,6 @@
                 box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
             }
         }
-        /* Added modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 90%;
-            width: 350px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .show-modal {
-            display: flex;
-        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -159,207 +135,17 @@
         <span class="text-xl">SOS</span>
     </button>
 
-    <!-- Status Modal -->
-    <div id="statusModal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-xl font-bold text-pink-600 mb-3">Emergency Alert</h2>
-            <p id="statusMessage" class="mb-4">Sending emergency alerts...</p>
-            <div id="statusProgress" class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-                <div id="statusBar" class="bg-pink-600 h-2.5 rounded-full" style="width: 0%"></div>
-            </div>
-            <div class="flex justify-end">
-                <button id="closeModal" class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Permission Request Modal -->
-    <div id="permissionModal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-xl font-bold text-pink-600 mb-3">Permission Required</h2>
-            <p class="mb-4">For SafeHer to work properly, please grant SMS and location permissions when prompted.</p>
-            <div class="flex justify-end">
-                <button id="grantPermission" class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700">Continue</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Check if running in Android WebView with message interface
-        const isAndroidWebView = window.AndroidInterface !== undefined;
-        const hasNativeSmsInterface = window.AndroidSmsInterface !== undefined;
-
-        // Show permission modal on first visit
-        if (!localStorage.getItem('permissionsRequested')) {
-            document.getElementById('permissionModal').classList.add('show-modal');
-            document.getElementById('grantPermission').addEventListener('click', function() {
-                document.getElementById('permissionModal').classList.remove('show-modal');
-                localStorage.setItem('permissionsRequested', 'true');
-                
-                // Try to request permissions if Android interface is available
-                if (isAndroidWebView && typeof AndroidInterface.requestPermissions === 'function') {
-                    AndroidInterface.requestPermissions();
-                }
-            });
-        }
-
-        // Close modal button
-        document.getElementById('closeModal').addEventListener('click', function() {
-            document.getElementById('statusModal').classList.remove('show-modal');
-        });
-
         // SOS Button Click Event
         document.getElementById('sosButton').addEventListener('click', function() {
             const savedPhone = localStorage.getItem('sosPhone');
             if (savedPhone) {
-                // Show status modal
-                showStatusModal("Initiating emergency alerts...");
-                updateStatusProgress(10);
-                
-                // Get location and trigger emergency actions
-                getLocationAndSendAlerts(savedPhone);
+                // Directly initiate call without sending SMS
+                window.location.href = `tel:${savedPhone}`;
             } else {
                 alert('No emergency contact found! Please add one in SOS Contacts.');
             }
         });
-
-        // Show status modal with message
-        function showStatusModal(message) {
-            document.getElementById('statusMessage').textContent = message;
-            document.getElementById('statusModal').classList.add('show-modal');
-        }
-
-        // Update progress bar in status modal
-        function updateStatusProgress(percent) {
-            document.getElementById('statusBar').style.width = percent + '%';
-        }
-
-        // Get location and send alerts
-        function getLocationAndSendAlerts(phoneNumber) {
-            if (navigator.geolocation) {
-                showStatusModal("Getting your location...");
-                updateStatusProgress(20);
-                
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        let latitude = position.coords.latitude;
-                        let longitude = position.coords.longitude;
-                        let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
-                        
-                        showStatusModal("Location obtained. Sending alerts...");
-                        updateStatusProgress(40);
-                        
-                        // Send emergency alerts with location
-                        sendEmergencyAlerts(phoneNumber, locationUrl);
-                    },
-                    function(error) {
-                        console.error("Geolocation error:", error);
-                        showStatusModal("Couldn't get location. Sending alerts without location...");
-                        updateStatusProgress(30);
-                        
-                        // Send emergency alerts without location
-                        sendEmergencyAlerts(phoneNumber, null);
-                    },
-                    { timeout: 10000 }
-                );
-            } else {
-                showStatusModal("Location not available. Sending alerts without location...");
-                updateStatusProgress(30);
-                sendEmergencyAlerts(phoneNumber, null);
-            }
-        }
-
-        // Send emergency alerts using all available methods
-        function sendEmergencyAlerts(phoneNumber, locationUrl) {
-            const savedName = localStorage.getItem('sosName') || 'Emergency Contact';
-            let message = locationUrl 
-                ? `SOS! EMERGENCY! ${savedName}, I need immediate help! My location: ${locationUrl}` 
-                : `SOS! EMERGENCY! ${savedName}, I need immediate help!`;
-            
-            try {
-                // Try sending SMS using Android Interface if available
-                if (hasNativeSmsInterface && typeof window.AndroidSmsInterface.sendSMS === 'function') {
-                    showStatusModal("Sending emergency SMS directly...");
-                    updateStatusProgress(60);
-                    
-                    // Call Android interface method to send SMS without user confirmation
-                    window.AndroidSmsInterface.sendSMS(phoneNumber, message);
-                    
-                    showStatusModal("SMS sent successfully! Initiating emergency call...");
-                    updateStatusProgress(80);
-                    
-                    // Make emergency call with delay
-                    setTimeout(() => {
-                        makeEmergencyCall(phoneNumber);
-                    }, 1500);
-                } 
-                // Try sending SMS using intent if in Android WebView
-                else if (isAndroidWebView && typeof window.AndroidInterface.sendSMS === 'function') {
-                    showStatusModal("Sending emergency SMS...");
-                    updateStatusProgress(60);
-                    
-                    window.AndroidInterface.sendSMS(phoneNumber, message);
-                    
-                    showStatusModal("SMS intent triggered. Initiating emergency call...");
-                    updateStatusProgress(80);
-                    
-                    // Make emergency call with delay
-                    setTimeout(() => {
-                        makeEmergencyCall(phoneNumber);
-                    }, 1500);
-                }
-                // Fallback for browsers
-                else {
-                    showStatusModal("Sending emergency SMS via browser...");
-                    updateStatusProgress(60);
-                    
-                    // For browsers, use standard SMS scheme (may open messaging app)
-                    const cleanPhone = phoneNumber.replace(/[^\d+]/g, '');
-                    
-                    // Try iframe approach first to avoid opening new tab
-                    const iframe = document.createElement('iframe');
-                    iframe.style.display = 'none';
-                    iframe.src = `sms:${cleanPhone}?body=${encodeURIComponent(message)}`;
-                    document.body.appendChild(iframe);
-                    
-                    // Fallback to window.open if iframe doesn't work
-                    setTimeout(() => {
-                        window.open(`sms:${cleanPhone}?body=${encodeURIComponent(message)}`, '_self');
-                        
-                        showStatusModal("SMS initiated. Making emergency call...");
-                        updateStatusProgress(80);
-                        
-                        // Make call after SMS
-                        setTimeout(() => {
-                            makeEmergencyCall(phoneNumber);
-                        }, 1500);
-                    }, 500);
-                }
-            } catch (error) {
-                console.error("Error sending emergency alerts:", error);
-                showStatusModal("Error sending SMS. Trying emergency call directly...");
-                updateStatusProgress(50);
-                makeEmergencyCall(phoneNumber);
-            }
-        }
-
-        // Make emergency call
-        function makeEmergencyCall(phoneNumber) {
-            try {
-                if (isAndroidWebView && typeof window.AndroidInterface.makeCall === 'function') {
-                    window.AndroidInterface.makeCall(phoneNumber);
-                } else {
-                    window.location.href = `tel:${phoneNumber}`;
-                }
-                
-                showStatusModal("Emergency call initiated.");
-                updateStatusProgress(100);
-            } catch (error) {
-                console.error("Error making emergency call:", error);
-                showStatusModal("Error making call. Please call emergency contacts manually.");
-                updateStatusProgress(100);
-            }
-        }
 
         // Slider functionality
         const slides = document.querySelectorAll('.slider img');
@@ -408,12 +194,9 @@
         let shakeThreshold = 1500; // Sensitivity threshold for detecting a shake
         let lastUpdate = 0;
         let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
-        let shakeHandlerActive = true; // Flag to prevent multiple triggers
         
         if (window.DeviceMotionEvent) {
             window.addEventListener('devicemotion', function(event) {
-                if (!shakeHandlerActive) return;
-                
                 let acceleration = event.accelerationIncludingGravity;
                 let currentTime = new Date().getTime();
                 
@@ -428,24 +211,8 @@
                     let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
         
                     if (speed > shakeThreshold) {
-                        // Prevent multiple triggers
-                        shakeHandlerActive = false;
-                        
-                        // Get saved phone number
-                        const savedPhone = localStorage.getItem('sosPhone');
-                        if (savedPhone) {
-                            showStatusModal("Shake detected! Initiating emergency protocol...");
-                            updateStatusProgress(10);
-                            getLocationAndSendAlerts(savedPhone);
-                            
-                            // Re-enable shake detection after delay
-                            setTimeout(() => {
-                                shakeHandlerActive = true;
-                            }, 10000);
-                        } else {
-                            alert("No SOS member number saved. Please add a member first.");
-                            shakeHandlerActive = true;
-                        }
+                        // Trigger emergency call only
+                        makeEmergencyCall();
                     }
         
                     lastX = x;
@@ -457,21 +224,31 @@
             console.log("Shake detection is not supported on this device.");
         }
 
-        // Gesture Pattern Detection
+        // Function to make emergency call
+        function makeEmergencyCall() {
+            const savedPhone = localStorage.getItem('sosPhone');
+            
+            if (!savedPhone) {
+                alert("No SOS member details saved. Please add a member first.");
+                return;
+            }
+
+            // Initiate call
+            window.location.href = `tel:${savedPhone}`;
+        }
+
+        // Gesture Pattern Detection (e.g., detecting diagonal gesture)
         let touchStartX = 0;
         let touchStartY = 0;
         let touchEndX = 0;
         let touchEndY = 0;
-        let gestureHandlerActive = true;
 
         document.addEventListener('touchstart', function(event) {
-            if (!gestureHandlerActive) return;
             touchStartX = event.changedTouches[0].screenX;
             touchStartY = event.changedTouches[0].screenY;
         }, false);
 
         document.addEventListener('touchend', function(event) {
-            if (!gestureHandlerActive) return;
             touchEndX = event.changedTouches[0].screenX;
             touchEndY = event.changedTouches[0].screenY;
             handleGesture();
@@ -482,23 +259,13 @@
             const deltaX = touchEndX - touchStartX;
             const deltaY = touchEndY - touchStartY;
 
-            if (deltaX > 100 && deltaY > 100) { // Diagonal gesture
-                // Prevent multiple triggers
-                gestureHandlerActive = false;
-                
+            if (deltaX > 100 && deltaY > 100) { // Example of a diagonal gesture
+                // Only initiate emergency call
                 const savedPhone = localStorage.getItem('sosPhone');
                 if (savedPhone) {
-                    showStatusModal("Emergency gesture detected! Initiating emergency protocol...");
-                    updateStatusProgress(10);
-                    getLocationAndSendAlerts(savedPhone);
-                    
-                    // Re-enable gesture detection after delay
-                    setTimeout(() => {
-                        gestureHandlerActive = true;
-                    }, 10000);
+                    window.location.href = `tel:${savedPhone}`;
                 } else {
                     alert("No SOS member number saved. Please add a member first.");
-                    gestureHandlerActive = true;
                 }
             }
         }
