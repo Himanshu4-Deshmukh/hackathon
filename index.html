@@ -140,7 +140,7 @@
         document.getElementById('sosButton').addEventListener('click', function() {
             const savedPhone = localStorage.getItem('sosPhone');
             if (savedPhone) {
-                // Directly initiate call without sending SMS
+                // Initiate call
                 window.location.href = `tel:${savedPhone}`;
             } else {
                 alert('No emergency contact found! Please add one in SOS Contacts.');
@@ -211,8 +211,8 @@
                     let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
         
                     if (speed > shakeThreshold) {
-                        // Trigger emergency call only
-                        makeEmergencyCall();
+                        // Trigger WhatsApp alert
+                        sendEmergencyAlerts();
                     }
         
                     lastX = x;
@@ -224,20 +224,51 @@
             console.log("Shake detection is not supported on this device.");
         }
 
-        // Function to make emergency call
-        function makeEmergencyCall() {
+        // Function to send WhatsApp alert
+        function sendEmergencyAlerts() {
             const savedPhone = localStorage.getItem('sosPhone');
+            const savedName = localStorage.getItem('sosName');
             
-            if (!savedPhone) {
+            if (!savedPhone || !savedName) {
                 alert("No SOS member details saved. Please add a member first.");
                 return;
             }
 
-            // Initiate call
-            window.location.href = `tel:${savedPhone}`;
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let latitude = position.coords.latitude;
+                    let longitude = position.coords.longitude;
+                    
+                    // Create Google Maps link with the current location
+                    let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                    
+                    // Emergency message
+                    let message = `SOS! Emergency Help!\n${savedName} Please help me, I'm trapped in an emergency situation!
+I don't know how to get out, and I'm really scared.
+Please, I need assistance urgently!\nHere's my location: ${locationUrl}`;
+                    
+                    // Redirect to WhatsApp
+                    window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
+                    
+                }, function(error) {
+                    alert("Unable to retrieve your location. Sending alert without location.");
+                    // Send message without location
+                    let message = "SOS! Emergency Help! I need urgent assistance!";
+                    
+                    // Redirect to WhatsApp
+                    window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
+                });
+            } else {
+                alert("Geolocation is not supported by this browser. Sending alert without location.");
+                // Send message without location
+                let message = "SOS! Emergency Help! I need urgent assistance!";
+                
+                // Redirect to WhatsApp
+                window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
+            }
         }
 
-        // Gesture Pattern Detection (e.g., detecting diagonal gesture)
+        // Gesture Pattern Detection (e.g., detecting "Z" pattern)
         let touchStartX = 0;
         let touchStartY = 0;
         let touchEndX = 0;
@@ -255,14 +286,15 @@
         }, false);
 
         function handleGesture() {
-            // Detect a simple diagonal gesture
+            // Detect a simple "Z" pattern or any custom pattern
             const deltaX = touchEndX - touchStartX;
             const deltaY = touchEndY - touchStartY;
 
             if (deltaX > 100 && deltaY > 100) { // Example of a diagonal gesture
-                // Only initiate emergency call
+                // Trigger emergency call
                 const savedPhone = localStorage.getItem('sosPhone');
                 if (savedPhone) {
+                    // Initiate call
                     window.location.href = `tel:${savedPhone}`;
                 } else {
                     alert("No SOS member number saved. Please add a member first.");
