@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women Safety Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .slider {
+            display: flex;
+            overflow: hidden;
+            border-radius: 10px; /* Rounded corners for slider */
+        }
+        .slider img {
+            min-width: 100%;
+            transition: transform 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between bg-pink-600  shadow-lg rounded-b-lg">
+        <div class="flex-1 text-white font-bold">
+        <center>
+        <img src="/img/logo123-removebg-preview.png" alt="" width="200px"></center>
+        </div>
+        <!-- <button id="sosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700"></button> -->
+    </nav>
+
+    <!-- Slider -->
+    <div class="mt-6  relative w-full overflow-hidden mx-2">
+        <div id="slider" class="slider ml-4 mr-4 shadow-lg">
+            <img src="/img/wo.png" alt="Slide 1" class="h-48 object-cover rounded-lg">
+            <img src="/img/s.jpg" alt="Slide 2" class="h-48 object-cover rounded-lg">
+            <img src="/img/ws.jpg" alt="Slide 2" class="h-48 object-cover rounded-lg">
+        
+        </div>
+        <button id="prev" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-200">❮</button>
+        <button id="next" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-200">❯</button>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="container mx-auto mt-6 grid grid-cols-2 gap-4 px-2">
+        <div onclick="window.location.href='safety.html'" class="bg-pink-300 rounded-lg p-4 flex flex-col items-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+            <img src="/img/safe.png" alt="Logo 1" class="w-24 h-24 mb-4">
+            <h2 class="text-lg font-semibold">Safety Tutorial</h2>
+        </div>
+        <div onclick="window.location.href='ad.html'" class="bg-pink-300 rounded-lg p-4 flex flex-col items-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+            <img src="/img/pr.png" alt="Logo 2" class="w-24 h-24 mb-4">
+            <h2 class="text-lg font-semibold">Add SOS Member</h2>
+        </div>
+        <div onclick="window.location.href='news.html'" class="bg-pink-300 rounded-lg p-4 flex flex-col items-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+            <img src="/img/global-news.png" alt="Logo 3" class="w-24 h-24 mb-4">
+            <h2 class="text-lg font-semibold">Recent News</h2>
+        </div>
+        <div onclick="window.location.href='chat.html'" class="bg-pink-300 rounded-lg p-4 flex flex-col items-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+            <img src="/img/awareness.png" alt="Logo 4" class="w-24 h-24 mb-4">
+            <h2 class="text-lg font-semibold">Community</h2>
+        </div>
+        <div onclick="window.location.href='route.html'" class="bg-pink-300 rounded-lg p-4 flex flex-col items-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+            <img src="/img/sv.svg" alt="Logo 4" class="w-24 h-24 mb-4">
+            <h2 class="text-lg font-semibold">Safe Route</h2>
+        </div>
+        <div onclick="window.location.href='whp.html'" class="bg-pink-300 rounded-lg p-4 flex flex-col items-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+            <img src="/img/help.png" alt="Logo 4" class="w-24 h-24 mb-4">
+            <h2 class="text-lg font-semibold">Helpline</h2>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-pink-600 mt-6 py-4 flex justify-center items-center shadow-lg rounded-t-lg">
+        <button   id="footerSosButton" class="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">SOS/Emergency</button>
+    </footer>
+
+    
+
+    <script>
+
+// SOS Button Click Event
+document.getElementById('sosButton').addEventListener('click', function() {
+    if (savedPhone) {
+        window.location.href = `tel:${savedPhone}`;
+    } else {
+        alert('Phone number not available!');
+    }
+});
+
+// Footer SOS Button Click Event
+document.getElementById('footerSosButton').addEventListener('click', function() {
+    if (savedPhone) {
+        window.location.href = `tel:${savedPhone}`;
+    } else {
+        alert('Phone number not available!');
+    }
+});
+
+
+        // Slider functionality
+        const slides = document.querySelectorAll('.slider img');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.style.transform = `translateX(${-index * 100}%)`;
+            });
+        }
+
+        document.getElementById('next').addEventListener('click', () => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        });
+
+        document.getElementById('prev').addEventListener('click', () => {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        });
+
+        // Auto slide functionality
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }, 5000); // Change slide every 5 seconds
+
+
+    </script>
+
+<script>
+    // Function to load saved SOS member details from localStorage
+    function loadMemberDetails() {
+        const savedName = localStorage.getItem('sosName');
+        const savedPhone = localStorage.getItem('sosPhone');
+        
+        if (savedName && savedPhone) {
+            document.getElementById('name').value = savedName;
+            document.getElementById('phone').value = savedPhone;
+            document.getElementById('editButton').classList.remove('hidden');
+        }
+    }
+
+    // Function to save SOS member details to localStorage
+    function saveMemberDetails(event) {
+        event.preventDefault();
+        
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+
+        if (name && phone) {
+            localStorage.setItem('sosName', name);
+            localStorage.setItem('sosPhone', phone);
+            alert('SOS Member details saved!');
+            document.getElementById('editButton').classList.remove('hidden');
+        } else {
+            alert('Please fill in all details.');
+        }
+    }
+
+    // Shake Detection and Location Sharing
+    let shakeThreshold = 1500; // Sensitivity threshold for detecting a shake
+    let lastUpdate = 0;
+    let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
+    
+    if (window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', function(event) {
+            let acceleration = event.accelerationIncludingGravity;
+            let currentTime = new Date().getTime();
+            
+            if ((currentTime - lastUpdate) > 100) {
+                let diffTime = currentTime - lastUpdate;
+                lastUpdate = currentTime;
+    
+                x = acceleration.x;
+                y = acceleration.y;
+                z = acceleration.z;
+    
+                let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+    
+                if (speed > shakeThreshold) {
+                    // Get the user's location and then redirect to WhatsApp
+                    sendLocationAndMessage();
+                }
+    
+                lastX = x;
+                lastY = y;
+                lastZ = z;
+            }
+        });
+    } else {
+        alert("Shake detection is not supported on this device.");
+    }
+
+    // Function to get current location and send WhatsApp message
+    function sendLocationAndMessage() {
+        const savedPhone = localStorage.getItem('sosPhone');
+        const savedName = localStorage.getItem('sosName');
+        if (!savedPhone || !savedName) {
+            alert("No SOS member details saved. Please add a member first.");
+            return;
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                let latitude = position.coords.latitude;
+                let longitude = position.coords.longitude;
+                
+                // Create Google Maps link with the current location
+                let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                
+                // WhatsApp URL with pre-filled message, including the member's name and location
+                let message = `SOS! Emergency Help!\n${savedName} Please help me, I'm trapped in an emergency situation!
+I don't know how to get out, and I'm really scared.
+Is anyone out there who can come to help?
+Please, I need assistance urgently!\nHere's my location: ${locationUrl}`;
+                
+                // Redirect to WhatsApp with the message and saved phone number
+                window.location.href = `https://wa.me/${savedPhone}?text=${encodeURIComponent(message)}`;
+            }, function(error) {
+                alert("Unable to retrieve your location. Please enable location services.");
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    // Gesture Pattern Detection (e.g., detecting "Z" pattern)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    document.addEventListener('touchstart', function(event) {
+        touchStartX = event.changedTouches[0].screenX;
+        touchStartY = event.changedTouches[0].screenY;
+    }, false);
+
+    document.addEventListener('touchend', function(event) {
+        touchEndX = event.changedTouches[0].screenX;
+        touchEndY = event.changedTouches[0].screenY;
+        handleGesture();
+    }, false);
+
+    function handleGesture() {
+        // Detect a simple "Z" pattern or any custom pattern
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+
+        if (deltaX > 100 && deltaY > 100) { // Example of a diagonal gesture
+            makeEmergencyCall();
+        }
+    }
+
+    // Function to trigger the call
+    function makeEmergencyCall() {
+        const savedPhone = localStorage.getItem('sosPhone');
+        if (!savedPhone) {
+            alert("No SOS member number saved. Please add a member first.");
+            return;
+        }
+
+        // Open the phone dialer with the saved number
+        window.location.href = `tel:${savedPhone}`;
+    }
+
+    // Event Listeners
+    document.getElementById('sosForm').addEventListener('submit', saveMemberDetails);
+    document.getElementById('editButton').addEventListener('click', function() {
+        document.getElementById('name').focus();
+    });
+
+    // Load saved member details on page load
+    window.onload = loadMemberDetails;
+</script>
+
+<!-- <script>
+    // Shake Detection and Location Sharing
+    let shakeThreshold = 100; // Sensitivity threshold for detecting a shake
+    let lastUpdate = 0;
+    let x = 0, y = 0, z = 0, lastX = 0, lastY = 0, lastZ = 0;
+    
+    if (window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', function(event) {
+            let acceleration = event.accelerationIncludingGravity;
+            let currentTime = new Date().getTime();
+            
+            if ((currentTime - lastUpdate) > 100) {
+                let diffTime = currentTime - lastUpdate;
+                lastUpdate = currentTime;
+    
+                x = acceleration.x;
+                y = acceleration.y;
+                z = acceleration.z;
+    
+                let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+    
+                if (speed > shakeThreshold) {
+                    // Get the user's location and then redirect to WhatsApp
+                    sendLocationAndMessage();
+                }
+    
+                lastX = x;
+                lastY = y;
+                lastZ = z;
+            }
+        });
+    } else {
+        alert("Shake detection is not supported on this device.");
+    }
+    
+    // Function to get current location and send WhatsApp message
+    function sendLocationAndMessage() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                let latitude = position.coords.latitude;
+                let longitude = position.coords.longitude;
+                
+                // Create Google Maps link with the current location
+                let locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                
+                // WhatsApp URL with pre-filled message and location
+                let message = `SOS! Emergency Help!\nHere's my location: ${locationUrl}`;
+                
+                // Redirect to WhatsApp with the message
+                window.location.href = `https://wa.me/917385758928?text=${encodeURIComponent(message)}`;
+            }, function(error) {
+                alert("Unable to retrieve your location. Please enable location services.");
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+    </script> -->
+    
+</body>
+</html>
