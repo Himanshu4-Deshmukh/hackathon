@@ -1,0 +1,4 @@
+        .nav-glass {
+            background: rgba(236, 72, 153, 0.85);
+            backdrop-filter: blur(8px);
+        }
